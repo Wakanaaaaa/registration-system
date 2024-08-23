@@ -1,5 +1,23 @@
+"use client";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "./firebase";
 import styles from "./page.module.css";
+import { useEffect } from "react";
 
 export default function Home() {
-  return <main className={styles.main}>hogehoge</main>;
+  useEffect(() => {
+    const fetchData = async () => {
+      const docSnap = await getDoc(doc(db, "4Wwords", "1", "episodes", "1"));
+      console.log(docSnap.data());
+    };
+    fetchData();
+  }, []);
+
+  return (
+    <main className={styles.main}>
+      <h1 className={styles.title}>話題選択支援研究</h1>
+      <h2 className={styles.title}>エピソード入力画面</h2>
+      {/* <Link >入力を開始する</Link> */}
+    </main>
+  );
 }
