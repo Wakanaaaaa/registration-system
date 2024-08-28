@@ -18,7 +18,7 @@ export default function Home({ params }: { params: { testerNumber: string } }) {
   const onSubmit = (e: any) => {
     e.preventDefault();
     console.log("submit");
-    router.push("/input-episodes");
+    // router.push("/input-episodes");
   };
 
   return (
@@ -27,11 +27,30 @@ export default function Home({ params }: { params: { testerNumber: string } }) {
       <h2 className={styles.title}>被験者番号:{params.testerNumber}</h2>
 
       {/* エピソードを入力 */}
-      <form action="post" onSubmit={onSubmit}>
-        <label htmlFor="tester-number">被験者番号</label>
-        <input id="tester-number" type="number" />
+      <form action="post" onSubmit={onSubmit} className={styles.form}>
+        <div className={styles.input}>
+          <label htmlFor="when" className={styles.label}>いつ</label>
+          <input id="when" type="text" />
+        </div>
 
-        <button type="submit">OK</button>
+        <div className={styles.input}>
+          <label htmlFor="where">どこで</label>
+          <input id="where" type="text" />
+        </div>
+
+        <div className={styles.input}>
+          <label htmlFor="who" className={styles.label}>誰と</label>
+          <input id="who" type="text" />
+        </div>
+
+        <div className={styles.input}>
+          <label htmlFor="what" className={styles.label}>何を</label>
+          <input id="what" type="text" />
+        </div>
+
+        <br />
+
+        <button type="submit">登録</button>
       </form>
     </main>
   );
