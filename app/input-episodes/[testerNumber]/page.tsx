@@ -72,6 +72,7 @@ export default function Home({ params }: { params: { testerNumber: string } }) {
             type="text"
             value={inputData.when}
             onChange={onChange}
+            required
           />
         </div>
 
@@ -82,6 +83,7 @@ export default function Home({ params }: { params: { testerNumber: string } }) {
             type="text"
             value={inputData.where}
             onChange={onChange}
+            required
           />
         </div>
 
@@ -94,6 +96,7 @@ export default function Home({ params }: { params: { testerNumber: string } }) {
             type="text"
             value={inputData.who}
             onChange={onChange}
+            required
           />
         </div>
 
@@ -106,6 +109,7 @@ export default function Home({ params }: { params: { testerNumber: string } }) {
             type="text"
             value={inputData.what}
             onChange={onChange}
+            required
           />
         </div>
 
