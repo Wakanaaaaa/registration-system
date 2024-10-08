@@ -39,11 +39,11 @@ export default function Home({ params }: { params: { testerNumber: string } }) {
     setInputData({ ...inputData, [e.target.id]: e.target.value });
   };
 
-  const onSubmit = (e: any) => {
+  const onSubmit = async(e: any) => {
     e.preventDefault();
     console.log(inputData);
     // firebaseにデータを登録
-    addDoc(collection(db, "4Wwords", testerNumber, "episodes"), inputData);
+    await addDoc(collection(db, "4Wwords", testerNumber, "episodes"), inputData);
     setEpisodeCount(episodeCount + 1);
     setEpisodeData((prev) => (prev ? [...prev, inputData] : [inputData]));
     setInputData({
