@@ -218,7 +218,7 @@ export default function Home({ params }: { params: { testerNumber: string } }) {
       {episodeData &&
         episodeData.map((data, index) => (
           <div key={index} className={styles.registration}>
-            <h2>エピソード{index + 1}</h2>
+            <h2>エピソード{episodeCount}</h2>
             <p>いつ：{data.when}</p>
             <p>どこで：{data.where}</p>
             <p>誰と：{data.who}</p>

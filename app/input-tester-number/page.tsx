@@ -23,7 +23,7 @@ export default function Home() {
 
   return (
     <main className={styles.main}>
-      <h1 className={styles.title}>話題選択支援研究</h1>
+      {/* <h1 className={styles.title}>話題選択支援研究</h1> */}
       <h2 className={styles.title}>被験者番号を入力してください</h2>
 
       {/* 被験者番号を入力 */}
