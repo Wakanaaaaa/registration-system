@@ -18,8 +18,11 @@ export default function Home() {
     <main className={styles.main}>
       <h1 className={styles.title}>話題選択支援研究</h1>
       <h2 className={styles.title}>エピソード入力画面</h2>
-
-      <Link href="/input-tester-number">入力を開始する</Link>
+      <div>
+        <Link href="/input-tester-number" passHref>
+          <button className={styles.button}>入力を開始する</button>
+        </Link>
+      </div>
     </main>
   );
 }
