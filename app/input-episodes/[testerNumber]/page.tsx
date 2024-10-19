@@ -97,12 +97,14 @@ export default function Home({ params }: { params: { testerNumber: string } }) {
     }
   };
 
-
   return (
     <main className={styles.main}>
       {/* <h1 className={styles.title}>話題選択支援研究</h1> */}
-      <h1 className={styles.title}>被験者番号:{params.testerNumber}</h1>
+      <h1 className={styles.title}>実験参加者番号:{params.testerNumber}</h1>
       <h2>現在の登録済エピソード数: {episodeCount}</h2>
+      <p>例：</p>
+      <p>「<b>10月11日の夜</b>に<b>大阪</b>に<b>友達</b>と<b>お笑い</b>を<b>見に行った</b>。<b>おもしろかった。</b>」</p>
+      <p>「<b>10月19日</b>に<b>ベランダ</b>で<b>一人</b>でいるときに<b>スーパームーン</b>を<b>見た</b>。<b>とてもきれいだった</b>。」</p>
 
       {/* エピソードを入力 */}
       <form action="post" onSubmit={onSubmit} className={styles.form}>
@@ -118,7 +120,7 @@ export default function Home({ params }: { params: { testerNumber: string } }) {
             required
             className={styles.inputField}
           />
-          
+
           {/* カレンダーアイコン付きのDatePicker */}
           <div className={styles.datePickerIcon}>
             <DatePicker
@@ -135,7 +137,6 @@ export default function Home({ params }: { params: { testerNumber: string } }) {
           >
             今日
           </button>
-
         </div>
 
         <div className={styles.input}>
@@ -163,7 +164,6 @@ export default function Home({ params }: { params: { testerNumber: string } }) {
             onChange={onChange}
             required
             className={styles.inputField}
-
           />
         </div>
 
@@ -213,12 +213,12 @@ export default function Home({ params }: { params: { testerNumber: string } }) {
 
         <button type="submit">登録</button>
       </form>
-
-      {/*_____提出したエピソードは見れる必要がある？*/}
+      
+      {/* エピソード表示 */}
       {episodeData &&
         episodeData.map((data, index) => (
           <div key={index} className={styles.registration}>
-            <h2>エピソード{episodeCount}</h2>
+            <h2>エピソード{episodeCount + 1 - episodeData.length + index}</h2> {/* 初回表示のエピソード番号 */}
             <p>いつ：{data.when}</p>
             <p>どこで：{data.where}</p>
             <p>誰と：{data.who}</p>

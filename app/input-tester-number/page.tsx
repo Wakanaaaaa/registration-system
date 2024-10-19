@@ -24,11 +24,11 @@ export default function Home() {
   return (
     <main className={styles.main}>
       {/* <h1 className={styles.title}>話題選択支援研究</h1> */}
-      <h2 className={styles.title}>被験者番号を入力してください</h2>
+      <h2 className={styles.title}>実験参加者番号を入力してください</h2>
 
       {/* 被験者番号を入力 */}
       <form action="post" onSubmit={onSubmit}>
-        <label htmlFor="tester-number">被験者番号</label>
+        <label htmlFor="tester-number">実験参加者番号</label>
         <input id="tester-number" type="number" />
 
         <button type="submit">OK</button>
