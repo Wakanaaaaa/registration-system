@@ -1,5 +1,10 @@
 "use client";
-import { addDoc, collection, getDocs } from "firebase/firestore";
+import {
+  addDoc,
+  collection,
+  getDocs,
+  serverTimestamp,
+} from "firebase/firestore";
 import { db } from "@/app/firebase";
 import styles from "./page.module.css";
 import { useEffect, useState, useRef } from "react";
@@ -54,11 +59,13 @@ export default function Home({ params }: { params: { testerNumber: string } }) {
   const onSubmit = async (e: any) => {
     e.preventDefault();
     console.log(inputData);
+
     // firebaseにデータを登録
-    await addDoc(
-      collection(db, "4Wwords", testerNumber, "episodes"),
-      inputData
-    );
+    await addDoc(collection(db, "4Wwords", testerNumber, "episodes"), {
+      ...inputData, // inputDataオブジェクトの各項目を展開
+      createdAt: serverTimestamp(),
+    });
+
     setEpisodeCount(episodeCount + 1);
     setEpisodeData((prev) => (prev ? [...prev, inputData] : [inputData]));
     setInputData({
