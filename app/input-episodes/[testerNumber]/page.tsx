@@ -9,7 +9,7 @@ import {
 } from "firebase/firestore";
 import { db } from "@/app/firebase";
 import styles from "./page.module.css";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { AiOutlineCalendar } from "react-icons/ai"; // カレンダーアイコン用
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -23,108 +23,130 @@ interface Episode {
   thoughts: string;
 }
 
+// 入力データの初期値
+const initialInputData: Episode = {
+  when: "",
+  where: "",
+  who: "",
+  what: "",
+  do: "",
+  thoughts: "",
+};
+
 export default function Home({ params }: { params: { testerNumber: string } }) {
   const { testerNumber } = params;
   const [episodeData, setEpisodeData] = useState<Episode[] | null>(null);
-  const [inputData, setInputData] = useState<Episode>({
-    when: "",
-    where: "",
-    who: "",
-    what: "",
-    do: "",
-    thoughts: "",
-  });
+  const [inputData, setInputData] = useState<Episode>(initialInputData);
   const [episodeCount, setEpisodeCount] = useState(0);
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null); // 日付用のState
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const sentence = `${inputData.when}に${inputData.where}で${inputData.who}と${inputData.what}を${inputData.do}。${inputData.thoughts}。`;
 
   useEffect(() => {
-    // エピソード数を取得する関数
     const fetchEpisodeCount = async () => {
       try {
-        // Firestoreから該当のtesterNumberのエピソードを取得
+        let episodeCollection = "";
+        if (episodeCount < 10) {
+          episodeCollection = "episodeA";
+        } else if (episodeCount < 20) {
+          episodeCollection = "episodeB";
+        } else {
+          episodeCollection = "episodeC";
+        }
+
         const episodesSnapshot = await getDocs(
-          collection(db, "4Wwords", testerNumber, "episodes")
+          collection(db, "4Wwords", testerNumber, episodeCollection)
         );
-        // ドキュメントの数を取得してセット
         setEpisodeCount(episodesSnapshot.size);
       } catch (error) {
         console.error("エピソードの取得に失敗しました: ", error);
       }
     };
     fetchEpisodeCount();
-  }, [testerNumber]);
+  }, [testerNumber, episodeCount]);
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputData({ ...inputData, [e.target.id]: e.target.value });
   };
 
-  const onSubmit = async (e: any) => {
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log(inputData);
-
-    // firebaseにデータを登録
-    // await addDoc(collection(db, "4Wwords", testerNumber, "episodes"), {
-    //   ...inputData, // inputDataオブジェクトの各項目を展開
-    //   sentence: sentence,
-    //   createdAt: serverTimestamp(),
-    // });
 
     const docID = `${episodeCount + 1}`;
-    // TODO: ここのepisodesをcountによってabcにふりわける
+
+    // episodeCountに基づいて適切なコレクションを選択
+    let episodeCollection = "";
+    if (episodeCount < 10) {
+      episodeCollection = "episodeA";
+    } else if (episodeCount < 20) {
+      episodeCollection = "episodeB";
+    } else {
+      episodeCollection = "episodeC";
+    }
+
+    // コレクションのパスを確認
+    console.log(`Adding episode to collection: ${episodeCollection}`);
     const docRef = doc(
-      collection(db, "4Wwords", testerNumber, "episodes"),
+      collection(db, "4Wwords", testerNumber, episodeCollection),
       docID
     );
 
     await setDoc(docRef, {
-      ...inputData, // inputDataオブジェクトの各項目を展開
+      ...inputData,
       sentence: sentence,
       createdAt: serverTimestamp(),
     });
-
-    setEpisodeCount(episodeCount + 1);
+    // コレクションに成功したメッセージ
+    console.log(`Episode added: ${docID} to ${episodeCollection}`);
+    setEpisodeCount((prev) => prev + 1);
     setEpisodeData((prev) => (prev ? [...prev, inputData] : [inputData]));
-    setInputData({
-      when: "",
-      where: "",
-      who: "",
-      what: "",
-      do: "",
-      thoughts: "",
-    });
+    setInputData(initialInputData);
   };
 
   // 日付をゼロ埋めする関数
-  const formatWithLeadingZero = (num: number) => {
-    return num < 10 ? `0${num}` : `${num}`;
-  };
+  const formatWithLeadingZero = (num: number) =>
+    num < 10 ? `0${num}` : `${num}`;
 
   // 今日の日付を入力する関数
   const setTodayDate = () => {
     const today = new Date();
-    const month = formatWithLeadingZero(today.getMonth() + 1); // getMonth()は0から始まるため+1
-    const day = formatWithLeadingZero(today.getDate());
-    const formattedDate = `${month}月${day}日`;
+    const formattedDate = `${formatWithLeadingZero(
+      today.getMonth() + 1
+    )}月${formatWithLeadingZero(today.getDate())}日`;
     setInputData((prev) => ({ ...prev, when: formattedDate }));
-    setSelectedDate(null); // カレンダーの選択をリセット
+    setSelectedDate(null);
   };
 
   // 日付を選択した時にフォーマットしてセットする関数
   const handleDateChange = (date: Date | null) => {
     if (date) {
-      const month = formatWithLeadingZero(date.getMonth() + 1);
-      const day = formatWithLeadingZero(date.getDate());
-      const formattedDate = `${month}月${day}日`;
-      setSelectedDate(date); // DatePicker用のState
-      setInputData((prev) => ({ ...prev, when: formattedDate })); // フォーマットした日付を入力欄に反映
+      const formattedDate = `${formatWithLeadingZero(
+        date.getMonth() + 1
+      )}月${formatWithLeadingZero(date.getDate())}日`;
+      setSelectedDate(date);
+      setInputData((prev) => ({ ...prev, when: formattedDate }));
     }
   };
 
+  // 入力フィールドを描画する関数
+  const renderInputField = (id: keyof Episode, label: string) => (
+    <div className={styles.input}>
+      <label htmlFor={id} className={styles.label}>
+        {label}
+      </label>
+      <input
+        id={id}
+        type="text"
+        value={inputData[id]}
+        onChange={onChange}
+        required
+        className={styles.inputField}
+      />
+    </div>
+  );
+
   return (
     <main className={styles.main}>
-      {/* <h1 className={styles.title}>話題選択支援研究</h1> */}
-      <h1 className={styles.title}>実験参加者番号:{params.testerNumber}</h1>
+      <h1 className={styles.title}>実験参加者番号:{testerNumber}</h1>
       <h2>現在の登録済エピソード数: {episodeCount}</h2>
       <br />
       <p>例：</p>
@@ -136,7 +158,6 @@ export default function Home({ params }: { params: { testerNumber: string } }) {
         「<b>10月19日</b>に<b>ベランダ</b>で<b>一人</b>でいるときに
         <b>スーパームーン</b>を<b>見た</b>。<b>とてもきれいだった</b>。」
       </p>
-
       <br />
       <p>現在の入力：</p>
       <p>
@@ -144,37 +165,31 @@ export default function Home({ params }: { params: { testerNumber: string } }) {
           <>
             {inputData.when && (
               <>
-                {" "}
                 <b>{inputData.when}</b>に
               </>
             )}
             {inputData.where && (
               <>
-                {" "}
                 <b>{inputData.where}</b>で
               </>
             )}
             {inputData.who && (
               <>
-                {" "}
                 <b>{inputData.who}</b>と
               </>
             )}
             {inputData.what && (
               <>
-                {" "}
                 <b>{inputData.what}</b>を
               </>
             )}
             {inputData.do && (
               <>
-                {" "}
                 <b>{inputData.do}</b>。
               </>
             )}
             {inputData.thoughts && (
               <>
-                {" "}
                 <b>{inputData.thoughts}</b>。
               </>
             )}
@@ -182,22 +197,9 @@ export default function Home({ params }: { params: { testerNumber: string } }) {
         }
       </p>
       <br />
-      {/* エピソードを入力 */}
       <form action="post" onSubmit={onSubmit} className={styles.form}>
         <div className={styles.input}>
-          <label htmlFor="when" className={styles.label}>
-            いつ
-          </label>
-          <input
-            id="when"
-            type="text"
-            value={inputData.when}
-            onChange={onChange}
-            required
-            className={styles.inputField}
-          />
-
-          {/* カレンダーアイコン付きのDatePicker */}
+          {renderInputField("when", "いつ")}
           <div className={styles.datePickerIcon}>
             <DatePicker
               selected={selectedDate}
@@ -214,79 +216,12 @@ export default function Home({ params }: { params: { testerNumber: string } }) {
             今日
           </button>
         </div>
-
-        <div className={styles.input}>
-          <label htmlFor="where" className={styles.label}>
-            どこで
-          </label>
-          <input
-            id="where"
-            type="text"
-            value={inputData.where}
-            onChange={onChange}
-            required
-            className={styles.inputField}
-          />
-        </div>
-
-        <div className={styles.input}>
-          <label htmlFor="who" className={styles.label}>
-            誰と
-          </label>
-          <input
-            id="who"
-            type="text"
-            value={inputData.who}
-            onChange={onChange}
-            required
-            className={styles.inputField}
-          />
-        </div>
-
-        <div className={styles.input}>
-          <label htmlFor="what" className={styles.label}>
-            何を
-          </label>
-          <input
-            id="what"
-            type="text"
-            value={inputData.what}
-            onChange={onChange}
-            required
-            className={styles.inputField}
-          />
-        </div>
-
-        <div className={styles.input}>
-          <label htmlFor="do" className={styles.label}>
-            どうした
-          </label>
-          <input
-            id="do"
-            type="text"
-            value={inputData.do}
-            onChange={onChange}
-            required
-            className={styles.inputField}
-          />
-        </div>
-
-        <div className={styles.input}>
-          <label htmlFor="thoughts" className={styles.label}>
-            感想
-          </label>
-          <input
-            id="thoughts"
-            type="text"
-            value={inputData.thoughts}
-            onChange={onChange}
-            required
-            className={styles.inputField}
-          />
-        </div>
-
+        {renderInputField("where", "どこで")}
+        {renderInputField("who", "誰と")}
+        {renderInputField("what", "何を")}
+        {renderInputField("do", "どうした")}
+        {renderInputField("thoughts", "感想")}
         <br />
-
         <button type="submit">登録</button>
       </form>
 
@@ -294,8 +229,7 @@ export default function Home({ params }: { params: { testerNumber: string } }) {
       {episodeData &&
         episodeData.map((data, index) => (
           <div key={index} className={styles.registration}>
-            <h2>エピソード{episodeCount + 1 - episodeData.length + index}</h2>{" "}
-            {/* 初回表示のエピソード番号 */}
+            <h2>エピソード{episodeCount + 1 - episodeData.length + index}</h2>
             <p>いつ：{data.when}</p>
             <p>どこで：{data.where}</p>
             <p>誰と：{data.who}</p>
