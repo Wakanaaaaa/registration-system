@@ -2,8 +2,10 @@
 import {
   addDoc,
   collection,
+  doc,
   getDocs,
   serverTimestamp,
+  setDoc,
 } from "firebase/firestore";
 import { db } from "@/app/firebase";
 import styles from "./page.module.css";
@@ -34,6 +36,7 @@ export default function Home({ params }: { params: { testerNumber: string } }) {
   });
   const [episodeCount, setEpisodeCount] = useState(0);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null); // 日付用のState
+  const sentence = `${inputData.when}に${inputData.where}で${inputData.who}と${inputData.what}を${inputData.do}。${inputData.thoughts}。`;
 
   useEffect(() => {
     // エピソード数を取得する関数
@@ -61,8 +64,22 @@ export default function Home({ params }: { params: { testerNumber: string } }) {
     console.log(inputData);
 
     // firebaseにデータを登録
-    await addDoc(collection(db, "4Wwords", testerNumber, "episodes"), {
+    // await addDoc(collection(db, "4Wwords", testerNumber, "episodes"), {
+    //   ...inputData, // inputDataオブジェクトの各項目を展開
+    //   sentence: sentence,
+    //   createdAt: serverTimestamp(),
+    // });
+
+    const docID = `${episodeCount + 1}`;
+    // TODO: ここのepisodesをcountによってabcにふりわける
+    const docRef = doc(
+      collection(db, "4Wwords", testerNumber, "episodes"),
+      docID
+    );
+
+    await setDoc(docRef, {
       ...inputData, // inputDataオブジェクトの各項目を展開
+      sentence: sentence,
       createdAt: serverTimestamp(),
     });
 
@@ -120,6 +137,51 @@ export default function Home({ params }: { params: { testerNumber: string } }) {
         <b>スーパームーン</b>を<b>見た</b>。<b>とてもきれいだった</b>。」
       </p>
 
+      <br />
+      <p>現在の入力：</p>
+      <p>
+        {
+          <>
+            {inputData.when && (
+              <>
+                {" "}
+                <b>{inputData.when}</b>に
+              </>
+            )}
+            {inputData.where && (
+              <>
+                {" "}
+                <b>{inputData.where}</b>で
+              </>
+            )}
+            {inputData.who && (
+              <>
+                {" "}
+                <b>{inputData.who}</b>と
+              </>
+            )}
+            {inputData.what && (
+              <>
+                {" "}
+                <b>{inputData.what}</b>を
+              </>
+            )}
+            {inputData.do && (
+              <>
+                {" "}
+                <b>{inputData.do}</b>。
+              </>
+            )}
+            {inputData.thoughts && (
+              <>
+                {" "}
+                <b>{inputData.thoughts}</b>。
+              </>
+            )}
+          </>
+        }
+      </p>
+      <br />
       {/* エピソードを入力 */}
       <form action="post" onSubmit={onSubmit} className={styles.form}>
         <div className={styles.input}>
