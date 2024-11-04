@@ -35,10 +35,25 @@
   font-size: 16px;
 }
 
+
 .todayButton {
   padding: 4px 8px;
   font-size: 16px;
   margin: 0 0 15px 10px;
+  white-space: nowrap; /* 改行防止 */
+}
+
+
+.whoInputWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* 追加: 子要素を左右に配置 */
+}
+
+.soloButton {
+  padding: 4px 8px;
+  font-size: 16px;
+  margin: 0 0 10px 30px;
   white-space: nowrap; /* 改行防止 */
 }
 
@@ -67,7 +82,7 @@
     margin-bottom: 10px;
   }
 
-  .todayButton {
+  .todayButton, .soloButton {
     margin-bottom: 20px;
   }
 }

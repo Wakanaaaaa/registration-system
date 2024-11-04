@@ -1,6 +1,5 @@
 "use client";
 import {
-  addDoc,
   collection,
   doc,
   getDocs,
@@ -21,7 +20,6 @@ interface Episode {
   what: string;
   do: string;
   thoughts: string;
-  sentence?: string; // Optional in case it's not always set
 }
 
 const initialInputData: Episode = {
@@ -107,6 +105,10 @@ export default function Home({ params }: { params: { testerNumber: string } }) {
     }
   };
 
+  const setSolo = () => {
+    setInputData((prev) => ({ ...prev, who: "一人" }));
+  };
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
     setInputData((prev) => ({ ...prev, [id]: value }));
@@ -154,6 +156,16 @@ export default function Home({ params }: { params: { testerNumber: string } }) {
     <main className={styles.main}>
       <h1 className={styles.title}>実験参加者番号:{testerNumber}</h1>
       <h2>現在の登録済エピソード数: {episodeCount}</h2>
+      <br />
+      <p>例：</p>
+      <p>
+        「<b>10月11日</b>に<b>大阪</b>で<b>友達</b>と<b>お笑い</b>を
+        <b>見に行った</b>。<b>おもしろかった。</b>」
+      </p>
+      <p>
+        「<b>10月19日</b>に<b>ベランダ</b>で<b>一人</b>で
+        <b>スーパームーン</b>を<b>見た</b>。<b>とてもきれいだった</b>。」
+      </p>
       <p>現在の入力：</p>
       <p>
         {inputData.when && (
@@ -168,7 +180,8 @@ export default function Home({ params }: { params: { testerNumber: string } }) {
         )}
         {inputData.who && (
           <>
-            <b>{inputData.who}</b>と
+            <b>{inputData.who}</b>
+            {inputData.who === "一人" ? "で" : "と"}
           </>
         )}
         {inputData.what && (
@@ -206,12 +219,20 @@ export default function Home({ params }: { params: { testerNumber: string } }) {
           </button>
         </div>
         {renderInputField("where", "どこで")}
-        {renderInputField("who", "誰と")}
+
+        <div className={styles.whoInputWrapper}>
+          {renderInputField("who", "誰と")}
+          <button type="button" onClick={setSolo} className={styles.soloButton}>
+            一人
+          </button>
+        </div>
+
         {renderInputField("what", "何を")}
         {renderInputField("do", "どうした")}
         {renderInputField("thoughts", "感想")}
         <button type="submit">登録</button>
       </form>
+
       {showNewEpisode && episodeData && (
         <div className={styles.registration}>
           <h2>エピソード{episodeCount}</h2>
