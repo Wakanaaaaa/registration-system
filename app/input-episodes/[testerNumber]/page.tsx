@@ -39,6 +39,7 @@ export default function Home({ params }: { params: { testerNumber: string } }) {
   const [inputData, setInputData] = useState<Episode>(initialInputData);
   const [episodeCount, setEpisodeCount] = useState(0);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [showNewEpisode, setShowNewEpisode] = useState(false); // 新しい状態変数を追加
   const sentence = `${inputData.when}に${inputData.where}で${inputData.who}と${inputData.what}を${inputData.do}。${inputData.thoughts}。`;
 
   useEffect(() => {
@@ -100,6 +101,7 @@ export default function Home({ params }: { params: { testerNumber: string } }) {
       setEpisodeCount((prev) => prev + 1);
       setEpisodeData((prev) => (prev ? [...prev, inputData] : [inputData]));
       setInputData(initialInputData);
+      setShowNewEpisode(true); // 新しいエピソードが追加された後に表示フラグをtrueに
     } catch (error) {
       console.error("エピソードの追加に失敗しました: ", error);
     }
@@ -189,6 +191,7 @@ export default function Home({ params }: { params: { testerNumber: string } }) {
         <div className={styles.input}>
           {renderInputField("when", "いつ")}
           <DatePicker
+            className={styles.datePickerIcon}
             selected={selectedDate}
             onChange={handleDateChange}
             dateFormat="MM月dd日"
@@ -209,18 +212,17 @@ export default function Home({ params }: { params: { testerNumber: string } }) {
         {renderInputField("thoughts", "感想")}
         <button type="submit">登録</button>
       </form>
-      {episodeData &&
-        episodeData.map((data, index) => (
-          <div key={index} className={styles.registration}>
-            <h2>エピソード{index + 1}</h2>
-            <p>いつ：{data.when}</p>
-            <p>どこで：{data.where}</p>
-            <p>誰と：{data.who}</p>
-            <p>何を：{data.what}</p>
-            <p>どうした：{data.do}</p>
-            <p>感想：{data.thoughts}</p>
-          </div>
-        ))}
+      {showNewEpisode && episodeData && (
+        <div className={styles.registration}>
+          <h2>エピソード{episodeCount}</h2>
+          <p>いつ：{episodeData[episodeData.length - 1].when}</p>
+          <p>どこで：{episodeData[episodeData.length - 1].where}</p>
+          <p>誰と：{episodeData[episodeData.length - 1].who}</p>
+          <p>何を：{episodeData[episodeData.length - 1].what}</p>
+          <p>どうした：{episodeData[episodeData.length - 1].do}</p>
+          <p>感想：{episodeData[episodeData.length - 1].thoughts}</p>
+        </div>
+      )}
     </main>
   );
 }
