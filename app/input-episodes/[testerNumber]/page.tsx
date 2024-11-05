@@ -38,8 +38,10 @@ export default function Home({ params }: { params: { testerNumber: string } }) {
   const [episodeCount, setEpisodeCount] = useState(0);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [showNewEpisode, setShowNewEpisode] = useState(false); // 新しい状態変数を追加
-  const sentence = `${inputData.when}に${inputData.where}で${inputData.who}と${inputData.what}を${inputData.do}。${inputData.thoughts}。`;
-
+  const sentence = `${inputData.when}に${inputData.where}で${inputData.who}${
+    inputData.who === "一人" ? "で" : "と"
+  }${inputData.what}を${inputData.do}。${inputData.thoughts}。`;
+  
   useEffect(() => {
     const fetchInitialData = async () => {
       try {
